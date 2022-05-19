@@ -1,0 +1,11 @@
+---
+- name: creating files and directories
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+  - name: Create a file
+    file:
+      path: /home/ansadmin/testfile
+      state: touch
+      mode: 0755

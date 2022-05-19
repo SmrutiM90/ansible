@@ -1,0 +1,14 @@
+---
+- name: Deleting the file from the servers
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+  - name: Delete the file from servers
+    file:
+      path: /home/ansadmin/testfile
+      state: absent
+  - name: Delete the directory from the servers
+    file:
+      path: /home/ansadmin/testdir
+      state: absent

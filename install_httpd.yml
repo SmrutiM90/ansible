@@ -1,0 +1,35 @@
+---
+- name: Installs Packages
+  hosts: all
+  become: true
+  
+  tasks:
+  - name: Start installing packages in Redhat Os Family
+    yum:
+      name: httpd
+      state: installed
+    when: ansible_os_family=="Redhat"
+    notify: start httpd services
+    
+  - name: Instll httpd service in UBUNTU OS Family
+    apt:
+      name: apache2
+      state: present
+    when: ansible_os_family=="Debian"
+    notify: Start apache2 services
+
+  - name: Copy the index files from ansible server to destination server
+    copy:
+      src: /home/ansadmin/playbooks/index.html
+      dest: /var/www/html
+
+  handlers:
+  - name: start httpd services
+    service:
+      name: httpd
+      state: started 
+
+  - name: Start apache2 services
+    service:
+      name: apache2
+      state: started

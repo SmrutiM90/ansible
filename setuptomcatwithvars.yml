@@ -1,0 +1,48 @@
+---
+- name: Playbook to install and setup apache tomcat
+  hosts: RHELandAmazonServers
+  become: true
+  gather_facts: true
+  vars_file:
+    - tomcat_vars.yml
+
+  tasks:
+  - name: Install Java
+    yum:
+      name: java
+      state: installed
+
+  - name: Download the tomcat Packages
+    get_url:
+      url: "{{ tomcat_url }}"
+      dest: /opt
+      mode: 0755
+
+  - name: extract the downloaded packages
+    unarchive:
+      src: /opt/{{ tomcat_package }}.tar.gz
+      dest: /opt
+      remote_src: yes
+  
+  - name : change the permissions of apache-tomcat files to execute
+    file:
+      path: /opt/{{tomcat_package}}
+      mode: 0755
+      recurse: true
+
+  - name: Create the Link files for /opt/apache-tomcat-9.0.63/bin/startup.sh
+    file:
+      src: /opt/{{tomcate_package}}/bin/{{ item.tomcate_script }}
+      dest: /usr/local/bin/{{ item.tomcat_command }}
+      state: link
+    loop:
+      - {{ tomcat_script: 'startup.sh' tomcat_command: tomcatup}}
+      - {{ tomcat_script: 'shutdown.sh' tomcat_command: tomcatdown}}
+
+  - name: start the tomcat services
+    command: nohup ./startup.sh
+      args:
+        chdir: /opt/{{tomcat_package}}/bin
+
+
+  
